@@ -1,21 +1,50 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { View, Text } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import landingpage from './src/screens/landingpage';
+import signin from './src/screens/signin';
+import SignUpScreen1 from './src/screens/signup/step1';
+import SignUpScreen2 from './src/screens/signup/step2';
+import SignUpScreen3 from './src/screens/signup/step3';
+import Home from './src/screens/home';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+
+const Stack = createStackNavigator();
+
+
+function App() {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen 
+          name="LandingPage" 
+          component={landingpage}
+          options={{headerShown:false}} />
+          <Stack.Screen 
+          name="Connexion" 
+          component={signin}
+          options={{headerShown:false}} />
+          <Stack.Screen 
+          name="Inscription1" 
+          component={SignUpScreen1}
+          options={{headerShown:false}} />
+          <Stack.Screen 
+          name="Inscription2" 
+          component={SignUpScreen2}
+          options={{headerShown:false}} />
+          <Stack.Screen 
+          name="Inscription3" 
+          component={SignUpScreen3}
+          options={{headerShown:false}} />
+           <Stack.Screen 
+          name="Home" 
+          component={Home}
+          options={{headerShown:false}} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
+  }
+  
+  export default App;
