@@ -21,8 +21,16 @@ const Home = ({ navigation }) => {
         >
             <View style={styles.textPrivate}>
                 <Text style={styles.color_textPrivate}>
-                    Nous vous reviendrons très prochainement
+                    Félicitation, votre enregistrement a été un succès
                 </Text>
+
+                <TouchableOpacity
+                 onPress={() => navigation.navigate('Inscription3')}
+                >
+                <Text style={[styles.color_textPrivate, {fontWeight: 'bold', paddingTop: 20}]}>
+                    {" "}Enregistrer les informations supplémentaires
+                    </Text>
+                </TouchableOpacity>
                 
             </View>
         </Animatable.View>

@@ -51,7 +51,7 @@ const landingpage = ({ navigation }) => {
           </View>
           </TouchableOpacity>
           <TouchableOpacity
-                   onPress={() => navigation.navigate('Inscription1')}
+                   onPress={() => navigation.navigate('Inscription3')}
                     style={{
                         // borderColor: '#1D2E3F',
                         // borderWidth: 1,

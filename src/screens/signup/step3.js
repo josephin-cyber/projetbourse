@@ -1,19 +1,60 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Button, TouchableOpacity, Dimensions, TextInput, Platform, StyleSheet, ScrollView, StatusBar, SafeAreaView, Image } from 'react-native';
 import RNPickerSelect from "react-native-picker-select";
 import * as Animatable from 'react-native-animatable';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Axios from 'axios';
+
+
+import instance from '../api/axios';
+import requests from '../api/request'; 
+
+
 
 const SignUpScreen3 = ({ navigation }) => {
 
 
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [categorie, setCategorie] = useState("");
+    const [listecategorie, setListecategorie] = useState([]);
+    const [statusEleve, setStatuseleve] = useState(false);
+    const [statusEtudiant, setStatusetudiant] = useState(false);
+    const [statusChercheur, setStatuschercheur] = useState(false);
     const [niveau, setNiveau] = useState("");
     const [option, setOption] = useState("");
     const [province, setProvince] = useState("");
+
+    const [data, setData] = React.useState({
+        categorie: '',
+        check_textInputChange: false,
+    });
+
+    const [erreur, setErreur] = React.useState({
+        Erreurcategorie: '',
+    });
+
+    useEffect(()=>{
+        Axios.get(instance.baseURL+requests.fetchCategorie)
+        .then(res=>{
+            console.log("categorie recuperé");
+            console.log(res.data);
+            
+            setListecategorie(res.data.map(occurence=>{
+                return{
+                     label: occurence.libelle,
+                     value: occurence.id
+                }
+            }));
+        })
+        
+        .catch(err=>{
+            console.log("Echec de récupération de categorie")
+        })
+            },[])
+
+
+
 
     const showDatePicker = () => {
         setDatePickerVisibility(true);
@@ -32,50 +73,24 @@ const SignUpScreen3 = ({ navigation }) => {
         console.log(Lieu);
 
     }
-    const [data, setData] = React.useState({
-        lieu_de_naissance: '',
-        categorie: '',
-        niveau: '',
-        option: '',
-        adresse: '',
-        province: '',
-        ville: '',
-        check_textInputChange: false,
-    });
-
-
-    const textInputChange = (val) => {
-        if (val.length !== 0) {
-            setData({
-                ...data,
-                lieu_de_naissance: val,
-                categorie: val,
-                niveau: val,
-                option: val,
-                adresse: val,
-                province: val,
-                ville: val,
-                check_textInputChange: true
-            });
-        } else {
-            setData({
-                ...data,
-                lieu_de_naissance: val,
-                categorie: val,
-                niveau: val,
-                option: val,
-                adresse: val,
-                province: val,
-                ville: val,
-                check_textInputChange: false
-            });
-        }
-    }
 
     const enregistrer = ()=>{
         console.log(data);
     }
 
+    const getNiveau =(idNiveau)=>{
+        console.log(idNiveau);
+
+        Axios.get("https://api-jeu-bourse.herokuapp.com/api/niveau/categorie/2")
+        .then(res=>{
+            console.log(res.data);
+        }).catch(err=>{
+            console.log(err);
+        })
+    }
+
+    console.log();
+    (listecategorie);
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor='#009387' barStyle="light-content" />
@@ -150,13 +165,12 @@ const SignUpScreen3 = ({ navigation }) => {
                         >
                             <RNPickerSelect
                                 placeholder={{ label: "Selectionnes ta catégorie", value: null }}
-                                onValueChange={(categorie) => setCategorie(categorie)}
+                                onValueChange={(val) => {
+                                    getNiveau(val)
+                                    setData({...data, categorie: val})
+                                }}
                                 style={styles.textInput}
-                                items={[
-                                    { label: "Elève", value: "Elève" },
-                                    { label: "Etudiant", value: "Etudiant" },
-                                    { label: "Chercheur", value: "Chercheur" }
-                                ]}
+                                items={listecategorie}
                             />
                         </Text>
 

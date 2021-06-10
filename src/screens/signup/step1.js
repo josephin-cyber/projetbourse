@@ -1,17 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef,useEffect } from 'react';
 import { View, Text, Button, TouchableOpacity, Dimensions, TextInput, Platform, StyleSheet, ScrollView, StatusBar, SafeAreaView, Image } from 'react-native';
 import RNPickerSelect from "react-native-picker-select";
 import * as Animatable from 'react-native-animatable';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import DatePicker from 'react-native-datepicker';
+import Axios from 'axios';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-const SignUpScreen1 = ({ navigation }) => {
+import SignUpScreen2 from './step2';
+import Home from '../home';
+import instance from '../api/axios';
+import requests from '../api/request'; 
+import { color } from 'react-native-reanimated';
 
-    // const [sex, setSex] = useState("");
-    // const [nom, setNom] = useState("");
-    // const [postnom, set] = useState("");
+export default function SignUpScreen1 ({ navigation }) {
 
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ ;
+    const [step, setStep]=useState(1);
+    const [listesexe, setListsexe] = useState([]);
     const [data, setData] = React.useState({
         nom: '',
         postnom: '',
@@ -20,34 +27,43 @@ const SignUpScreen1 = ({ navigation }) => {
         pwd: '',
         confirm_pwd: '',
         telephone: '',
+        money:'',
         check_textInputChange: false,
         secureTextEntry: true,
         confirm_secureTextEntry: true,
     });
 
-    const textInputChange = (val) => {
-        if (val.length !== 0) {
-            setData({
-                ...data,
-                nom: val,
-                postnom: val,
-                prenom: val,
-                sex: val,
-                telephone: val,
-                check_textInputChange: true
-            });
-        } else {
-            setData({
-                ...data,
-                nom: val,
-                postnom: val,
-                prenom: val,
-                sex: val,
-                telephone: val,
-                check_textInputChange: false
-            });
+    const [erreur, setErreur] = React.useState({
+        Erreurnom: '',
+        Erreurpostnom: '',
+        Erreurprenom: '',
+        Erreursex:'',
+        Erreurpwd: '',
+        Erreurconfirm_pwd: '',
+        Erreurtelephone: '',
+        Erreurmoney:'',
+    });
+
+
+    useEffect(()=>{
+Axios.get(instance.baseURL+requests.fetchSexe)
+.then(res=>{
+    console.log("sex recuperé");
+    console.log(res.data);
+    
+    setListsexe(res.data.map(occurence=>{
+        return{
+             label: occurence.libelle,
+             value: occurence.id
         }
-    }
+    }));
+})
+
+.catch(err=>{
+    console.log("Echec de récupération de sex")
+})
+    },[])
+
 
     const handlePasswordChange = (val) => {
         setData({
@@ -77,13 +93,54 @@ const SignUpScreen1 = ({ navigation }) => {
         });
     }
 
-    const enregistrer = ()=>{
-        console.log(data);
+    const enregistrer = ()=>{        
+        const player ={
+            nom:data.nom,
+            postnom:data.postnom,
+            prenom:data.prenom,
+            telephone: data.telephone,
+            password:data.pwd,
+            sexe_id: data.sex,
+        }
+        console.log(player);
+
+        Axios.post(instance.baseURL+requests.fetchJoueur, player)
+    .then(res=>{
+        console.log("Joueur Enregistré");
+        navigation.navigate('Home')
+
+    })
+    .catch(err=>{
+        console.log("Echec de l'enregistrement");
+        
+    })
+
     }
 
-    return (
-        <View style={styles.container}>
-            <StatusBar backgroundColor='#009387' barStyle="light-content" />
+    const nextstep = ()=>{
+        console.log("click");
+        console.log(data.nom.length);
+        if(data.nom.length<3){
+            setErreur({...erreur, Erreurnom:"Ce format n'est pas valide"})
+        } else{
+            setStep(step+1);
+        }
+    }
+
+    const goBack = ()=>{
+        console.log("click");
+        setStep(step-1);
+    }
+
+    const changeMoney=(mymoney)=>{
+        setData({...data, money: mymoney});
+    } 
+    
+
+    switch(step){
+        case 1:
+            return <View style={styles.container}>
+            <StatusBar backgroundColor='#009387' barStyle="light-content"/>
             <View style={styles.header}>
                 <Text style={styles.text_header}>Crée ton compte</Text>
             </View>
@@ -91,6 +148,12 @@ const SignUpScreen1 = ({ navigation }) => {
                 animation="fadeInUpBig"
                 style={styles.footer}
             >
+                <KeyboardAwareScrollView
+                enableAutomaticScroll
+                enableOnAndroid={true}
+                extraScrollHeight={300}
+                >
+
                 <ScrollView>
                     <Text style={styles.text_footer}>Nom</Text>
                     <View style={styles.action}>
@@ -104,7 +167,13 @@ const SignUpScreen1 = ({ navigation }) => {
                             style={styles.textInput}
                             autoCapitalize="none"
                             onChangeText={(val) => setData({...data, nom: val})}
+                           autoComplete="given-name"
+                           type="text"
+                           maxlength="15"
+                           
                         />
+                        
+
                         {data.check_textInputChange ?
                             <Animatable.View
                                 animation="bounceIn"
@@ -116,7 +185,10 @@ const SignUpScreen1 = ({ navigation }) => {
                                 />
                             </Animatable.View>
                             : null}
+                            
                     </View>
+                    <Text style={{color:"red"}}>{erreur.Erreurnom}</Text>
+
                     <Text style={styles.text_footer, {
                         marginTop: 35, color: '#05375a',
                         fontSize: 18
@@ -145,7 +217,7 @@ const SignUpScreen1 = ({ navigation }) => {
                             </Animatable.View>
                             : null}
                     </View>
-
+    
                     <Text style={styles.text_footer, {
                         marginTop: 35, color: '#05375a',
                         fontSize: 18
@@ -182,7 +254,7 @@ const SignUpScreen1 = ({ navigation }) => {
                         <TouchableOpacity
                             style={{ flexDirection:'row' }}
                             onPress={() => console.log('Doris')}>
-
+    
                             <View >
                                 <Image
                                     source={require('../../../assets/rdcongo.png')}
@@ -200,13 +272,15 @@ const SignUpScreen1 = ({ navigation }) => {
                                     +243
                                 </Text>
                             </View>
-
+    
                         </TouchableOpacity>
-
+    
                         <TextInput
                             placeholder="Ton numéro de téléphone"
                             style={styles.textInput}
                             autoCapitalize="none"
+                            // keyboardType="numeric"
+                            // maxLength={9}
                             onChangeText={(val) => setData({...data, telephone: val})}
                         />
                         {data.check_textInputChange ?
@@ -221,7 +295,7 @@ const SignUpScreen1 = ({ navigation }) => {
                             </Animatable.View>
                             : null}
                     </View>
-
+    
                     <Text style={styles.text_footer, {
                         marginTop: 35, color: '#05375a',
                         fontSize: 18
@@ -239,15 +313,12 @@ const SignUpScreen1 = ({ navigation }) => {
                                 placeholder={{ label: "Selectionnes ton sexe", value: null }}
                                 onValueChange={(val) => setData({...data, sex: val})}
                                 style={styles.textInput}
-                                items={[
-                                    { label: "Femme", value: "Femme" },
-                                    { label: "Homme", value: "Homme" }
-                                ]}
+                                items={listesexe}
                             />
                         </Text>
-
+    
                     </View>
-
+    
                     <Text style={[styles.text_footer, {
                         marginTop: 35
                     }]}>Mot de passe</Text>
@@ -282,7 +353,7 @@ const SignUpScreen1 = ({ navigation }) => {
                             }
                         </TouchableOpacity>
                     </View>
-
+    
                     <Text style={[styles.text_footer, {
                         marginTop: 35
                     }]}>Confirme ton mot de passe</Text>
@@ -319,7 +390,8 @@ const SignUpScreen1 = ({ navigation }) => {
                     </View>
                     <View style={styles.button}>
                         <TouchableOpacity
-                           onPress={() => navigation.navigate('Inscription2')
+                           onPress={() => nextstep()
+
                         }
                             style={[styles.signIn, {
                                 borderColor: '#1D2E3F',
@@ -334,16 +406,21 @@ const SignUpScreen1 = ({ navigation }) => {
                                     color="#05375a"
                                     size={20}
                                 /></Text>
-
+    
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+                </KeyboardAwareScrollView>
+                
             </Animatable.View>
         </View>
-    );
+        break;
+
+        case 2:
+            return <SignUpScreen2 navigation={navigation} changeMoney={changeMoney} goBack={goBack} submit={enregistrer}/>
+    }
 };
 
-export default SignUpScreen1;
 
 const styles = StyleSheet.create({
     container: {
@@ -414,4 +491,4 @@ const styles = StyleSheet.create({
         width: 200,
         marginTop: 20,
     },
-});
+})

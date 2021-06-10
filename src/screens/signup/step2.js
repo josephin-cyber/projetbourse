@@ -6,14 +6,27 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import DatePicker from 'react-native-datepicker';
 
-const SignUpScreen2 = ({ navigation }) => {
+import Home from '../home';
 
+const SignUpScreen2 = ({ navigation, changeMoney, submit, goBack }) => {
+    console.log(submit);
     const [money, setMoney] = useState("");
-    
+
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor='#009387' barStyle="light-content" />
             <View style={styles.header}>
+                <TouchableOpacity
+                onPress={() => goBack()}
+                >
+                <FontAwesome
+                    name="arrow-left"
+                    color="#fff"
+                    size={25}
+                    style={{paddingBottom:30}}
+                />
+                </TouchableOpacity>
+               
                 <Text style={styles.text_header}>Modalités</Text>
             </View>
             <Animatable.View
@@ -21,7 +34,7 @@ const SignUpScreen2 = ({ navigation }) => {
                 style={styles.footer}
             >
                 <ScrollView>
-                    
+
                     <Text style={styles.text_footer, {
                         color: '#05375a',
                         fontSize: 18
@@ -37,7 +50,7 @@ const SignUpScreen2 = ({ navigation }) => {
                         >
                             <RNPickerSelect
                                 placeholder={{ label: "Selectionnes le mode de paiment", value: null }}
-                                onValueChange={(money) => setMoney(money)}
+                                onValueChange={(money) => changeMoney(money)}
                                 style={styles.textInput}
                                 items={[
                                     { label: "Mpesa", value: "Mpesa" },
@@ -50,14 +63,16 @@ const SignUpScreen2 = ({ navigation }) => {
 
                     </View>
                     <View style={styles.textPrivate}>
-                <Text style={styles.color_textPrivate}>
-                    En souscrivant au service, votre compte sera crédité de
+                        <Text style={styles.color_textPrivate}>
+                            En souscrivant au service, votre compte sera crédité de
                 </Text>
-                <Text style={[styles.color_textPrivate, {fontWeight: 'bold'}]}>1$</Text>
-            </View>
+                        <Text style={[styles.color_textPrivate, { fontWeight: 'bold' }]}>1$</Text>
+                    </View>
                     <View style={styles.button}>
                         <TouchableOpacity
-                           onPress={() => navigation.navigate('Inscription3')}
+                            onPress={() =>
+                                submit() 
+                            }
                             style={[styles.signIn, {
                                 borderColor: '#1D2E3F',
                                 borderWidth: 1,
