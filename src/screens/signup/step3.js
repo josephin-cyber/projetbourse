@@ -6,54 +6,87 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Axios from 'axios';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 import instance from '../api/axios';
-import requests from '../api/request'; 
+import requests from '../api/request';
 
 
 
-const SignUpScreen3 = ({ navigation }) => {
-
+export default function SignUpScreen3 ({ navigation }) {
 
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [listecategorie, setListecategorie] = useState([]);
-    const [statusEleve, setStatuseleve] = useState(false);
-    const [statusEtudiant, setStatusetudiant] = useState(false);
-    const [statusChercheur, setStatuschercheur] = useState(false);
-    const [niveau, setNiveau] = useState("");
-    const [option, setOption] = useState("");
-    const [province, setProvince] = useState("");
+    const [listeniveau, setListeniveau] = useState([]);
+    const [listeprovince, setListeprovince] = useState([]);
+    const [listeoption, setListeoption] = useState([]);
+    const [listecommune, setListecommune] = useState([]);
 
     const [data, setData] = React.useState({
+        lieuDeNaissance: '',
+        dateDeNaissance: '',
+        ecole: '',
         categorie: '',
+        niveau: '',
+        province: '',
+        option: '',
+        commune: '',
+        email:'',
         check_textInputChange: false,
     });
 
     const [erreur, setErreur] = React.useState({
+        Erreurlieudenaissance:'',
+        ErreurdateDeNaissance:'',
+        Erreurecole:'',
+        Erreuremail:'',
         Erreurcategorie: '',
+        Erreurniveau: '',
+        Erreurprovince: '',
+        Erreuroption: '',
+        Erreurcommune: '',
     });
 
-    useEffect(()=>{
-        Axios.get(instance.baseURL+requests.fetchCategorie)
-        .then(res=>{
-            console.log("categorie recuperé");
-            console.log(res.data);
-            
-            setListecategorie(res.data.map(occurence=>{
-                return{
-                     label: occurence.libelle,
-                     value: occurence.id
-                }
-            }));
-        })
-        
-        .catch(err=>{
-            console.log("Echec de récupération de categorie")
-        })
-            },[])
+    useEffect(() => {
+        Axios.get(instance.baseURL + requests.fetchCategorie)
+            .then(res => {
+                console.log("categorie recuperé");
+                console.log(res.data);
+
+                setListecategorie(res.data.map(occurence => {
+                    return {
+                        label: occurence.libelle,
+                        value: occurence.id
+                    }
+                }));
+            })
+
+            .catch(err => {
+                console.log("Echec de récupération de categorie")
+            })
 
 
+
+            Axios.get(instance.baseURL + requests.fetchProvince)
+            .then(res => {
+                console.log("province recuperée");
+                console.log(res.data);
+
+                setListeprovince(res.data.map(occurence => {
+                    return {
+                        label: occurence.libelle,
+                        value: occurence.id
+                    }
+                }));
+            })
+
+            .catch(err => {
+                console.log("Echec de récupération de province")
+            })
+
+    }, []
+    )
 
 
     const showDatePicker = () => {
@@ -65,32 +98,104 @@ const SignUpScreen3 = ({ navigation }) => {
     };
 
     const handleConfirm = (date) => {
-        console.warn(date);
+        date = date.toString().substr(4, 12)
+        console.log(date);
+        setData({...data, dateDeNaissance: date})
         hideDatePicker();
     };
 
-    const enrLieuDeNaissance = (Lieu) =>{
+    const enrLieuDeNaissance = (Lieu) => {
         console.log(Lieu);
 
     }
 
-    const enregistrer = ()=>{
-        console.log(data);
-    }
-
-    const getNiveau =(idNiveau)=>{
+    const getNiveau = (idNiveau) => {
         console.log(idNiveau);
 
-        Axios.get("https://api-jeu-bourse.herokuapp.com/api/niveau/categorie/2")
-        .then(res=>{
-            console.log(res.data);
-        }).catch(err=>{
-            console.log(err);
-        })
+        Axios.get("https://api-jeu-bourse.herokuapp.com/api/niveau/categorie/" + idNiveau)
+            .then(res => {
+                console.log(res.data);
+                setListeniveau(res.data.map(occurence => {
+                    return {
+                        label: occurence.libelle,
+                        value: occurence.id
+                    }
+                }));
+            })
+            .catch(err => {
+                console.log("Echec de récupération de niveau");
+            })
     }
 
+    const getOption = (idOption) => {
+        console.log(idOption);
+
+        Axios.get(instance.baseURL + requests.fetchOptionByCategory + idOption)
+            .then(res => {
+                console.log(res.data);
+                setListeoption(res.data.map(occurence => {
+                    return {
+                        label: occurence.libelle,
+                        value: occurence.id
+                    }
+                }));
+            })
+            .catch(err => {
+                console.log("Echec de récupération d'option");
+            })
+    }
+
+    const getCommune = (idProvince) => {
+        console.log(idProvince);
+
+        Axios.get(instance.baseURL + requests.fetchCommuneByProvince + idProvince)
+            .then(res => {
+                console.log(res.data);
+                setListecommune(res.data.map(occurence => {
+                    return {
+                        label: occurence.libelle,
+                        value: occurence.id
+                    }
+                }));
+            })
+            .catch(err => {
+                console.log("Echec de récupération de commune");
+            })
+    }
     console.log();
     (listecategorie);
+    (listeprovince);
+
+
+    const enregistrer = ()=>{        
+        const player ={
+            lieunaissance:data.lieuDeNaissance,
+            datenaissance:data.dateDeNaissance,
+            categorie_id:data.categorie,
+            niveau_id:data.niveau,
+            option_id:data.option,
+            etablissement:data.ecole,
+            province_id:data.province,
+            commune_id:data.commune,
+            adresse:data.adresse,
+            email:data.email,
+        }
+        console.log(player);
+
+        Axios.put(instance.baseURL+requests.fetchJoueur+"/1", player)
+    .then(res=>{
+        console.log("Joueur Enregistré");
+        navigation.navigate('Homepost')
+
+    })
+    .catch(err=>{
+        console.log("Echec de l'enregistrement");
+        
+    })
+
+    
+ }
+
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor='#009387' barStyle="light-content" />
@@ -101,7 +206,13 @@ const SignUpScreen3 = ({ navigation }) => {
                 animation="fadeInUpBig"
                 style={styles.footer}
             >
-                <ScrollView>
+                <KeyboardAwareScrollView
+                enableAutomaticScroll
+                enableOnAndroid={true}
+                extraScrollHeight={300}
+                >
+
+<ScrollView>
                     <Text style={styles.text_footer}>Lieu de naissance</Text>
                     <View style={styles.action}>
                         <FontAwesome
@@ -113,7 +224,7 @@ const SignUpScreen3 = ({ navigation }) => {
                             placeholder="Ton lieu de naissance"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => setData({...data, lieu_de_naissance: val})}
+                            onChangeText={(val) => setData({ ...data, lieuDeNaissance: val })}
                         />
                         {data.check_textInputChange ?
                             <Animatable.View
@@ -133,13 +244,16 @@ const SignUpScreen3 = ({ navigation }) => {
                     }}>Date de naissance</Text>
                     <View style={styles.action}>
                         <TouchableOpacity
-                        onPress={showDatePicker}
+                            onPress={showDatePicker}
+                            style={{ flexDirection:'row'}}
                         >
-                        <FontAwesome
-                            name="calendar"
-                            color="#05375a"
-                            size={20}
-                        />
+                            <FontAwesome
+                                name="calendar"
+                                color="#05375a"
+                                size={20}
+                            />
+
+                        <Text style={{marginLeft:10}}>{data.dateDeNaissance}</Text>
                         </TouchableOpacity>
                         <DateTimePickerModal
                             isVisible={isDatePickerVisible}
@@ -147,7 +261,7 @@ const SignUpScreen3 = ({ navigation }) => {
                             onConfirm={handleConfirm}
                             onCancel={hideDatePicker}
                         />
-                        
+
                     </View>
 
                     <Text style={styles.text_footer, {
@@ -167,7 +281,8 @@ const SignUpScreen3 = ({ navigation }) => {
                                 placeholder={{ label: "Selectionnes ta catégorie", value: null }}
                                 onValueChange={(val) => {
                                     getNiveau(val)
-                                    setData({...data, categorie: val})
+                                    getOption(val)
+                                    setData({ ...data, categorie: val })
                                 }}
                                 style={styles.textInput}
                                 items={listecategorie}
@@ -175,59 +290,98 @@ const SignUpScreen3 = ({ navigation }) => {
                         </Text>
 
                     </View>
+                    {listeniveau.length > 0 ?
+
+                        <View>
+                            <Text style={styles.text_footer, {
+                                marginTop: 35, color: '#05375a',
+                                fontSize: 18
+                            }}>niveau</Text>
+                            <View
+                                style={styles.action}>
+                                <FontAwesome
+                                    name="user-o"
+                                    color="#05375a"
+                                    size={20}
+                                />
+                                <Text
+                                    style={styles.textInput,{ marginLeft: 15 }}
+                                >
+                                    <RNPickerSelect
+                                        placeholder={{ label: "Selectionnes ton niveau", value: null }}
+                                        onValueChange={(val) => setData({ ...data, niveau: val })}
+                                        style={styles.textInput}
+                                        items={listeniveau}
+                                    />
+                                </Text>
+
+                            </View>
+                        </View>
+                        :
+                        null
+                    }
+
+                    {listeoption.length > 0 ?
+                        <View>
+                            <Text style={styles.text_footer, {
+                                marginTop: 35, color: '#05375a',
+                                fontSize: 18
+                            }}>Option</Text>
+                            <View style={styles.action}>
+                                <FontAwesome
+                                    name="user-o"
+                                    color="#05375a"
+                                    size={20}
+                                />
+                                <Text
+                                    style={{ marginLeft: 15 }}
+                                >
+                                    <RNPickerSelect
+                                        placeholder={{ label: "Selectionnes ton option", value: null }}
+                                        onValueChange={(val) => {
+                                            setData({ ...data, option: val })
+                                        }
+                                        }
+                                        style={styles.textInput}
+                                        items={listeoption}
+                                    />
+                                </Text>
+
+                            </View>
+                        </View>
+                        :
+                        null
+                    }
+
                     <Text style={styles.text_footer, {
                         marginTop: 35, color: '#05375a',
                         fontSize: 18
-                    }}>niveau</Text>
+                    }}>Ecole/Université</Text>
                     <View style={styles.action}>
                         <FontAwesome
-                            name="user-o"
+                            name="map"
                             color="#05375a"
                             size={20}
                         />
-                        <Text
-                            style={{ marginLeft: 15 }}
-                        >
-                            <RNPickerSelect
-                                placeholder={{ label: "Selectionnes ton niveau", value: null }}
-                                onValueChange={(niveau) => setNiveau(niveau)}
-                                style={styles.textInput}
-                                items={[
-                                    { label: "Graduat", value: "Graduat" },
-                                    { label: "D6", value: "D6" },
-                                    { label: "Master", value: "Master" }
-                                ]}
-                            />
-                        </Text>
-
-                    </View>
-                    <Text style={styles.text_footer, {
-                        marginTop: 35, color: '#05375a',
-                        fontSize: 18
-                    }}>Option</Text>
-                    <View style={styles.action}>
-                        <FontAwesome
-                            name="user-o"
-                            color="#05375a"
-                            size={20}
+                        <TextInput
+                            placeholder="Ton ecole ou ton université"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(val) => setData({ ...data, ecole: val })}
                         />
-                        <Text
-                            style={{ marginLeft: 15 }}
-                        >
-                            <RNPickerSelect
-                                placeholder={{ label: "Selectionnes ton niveau", value: null }}
-                                onValueChange={(option) => setOption(option)}
-                                style={styles.textInput}
-                                items={[
-                                    { label: "Littéraire", value: "Littéraire" },
-                                    { label: "Commercial", value: "Commercial" },
-                                    { label: "Pédagogie", value: "Pédagogie" }
-                                ]}
-                            />
-                        </Text>
-
+                        {data.check_textInputChange ?
+                            <Animatable.View
+                                animation="bounceIn"
+                            >
+                                <Feather
+                                    name="check-circle"
+                                    color="green"
+                                    size={20}
+                                />
+                            </Animatable.View>
+                            : null}
                     </View>
-                    
+
                     <Text style={styles.text_footer, {
                         marginTop: 35, color: '#05375a',
                         fontSize: 18
@@ -243,19 +397,58 @@ const SignUpScreen3 = ({ navigation }) => {
                         >
                             <RNPickerSelect
                                 placeholder={{ label: "Selectionnes ta province", value: null }}
-                                onValueChange={(province) => setOption(province)}
+                                onValueChange={(val) => {
+                                    getCommune(val)
+                                    setData({ ...data, province: val })
+                                }
+                                }
+
                                 style={styles.textInput}
-                                items={[
-                                    { label: "Maniema", value: "Maniema" },
-                                    { label: "Kinshasa", value: "Kinshasa" },
-                                    { label: "Nord-Kivu", value: "Nord-Kivu" }
-                                ]}
+                                items={listeprovince}
                             />
                         </Text>
 
                     </View>
 
-                    <Text style={styles.text_footer}>Adresse</Text>
+                    {listecommune.length > 0 ?
+
+                        <View>
+                            <Text style={styles.text_footer, {
+                                marginTop: 35, color: '#05375a',
+                                fontSize: 18
+                            }}>Commune</Text>
+                            <View style={styles.action}>
+                                <FontAwesome
+                                    name="user-o"
+                                    color="#05375a"
+                                    size={20}
+                                />
+                                <Text
+                                    style={{ marginLeft: 15 }}
+                                >
+                                    <RNPickerSelect
+                                        placeholder={{ label: "Selectionnes ta commune", value: null }}
+                                        onValueChange={(val) => {
+                                            setData({ ...data, commune: val })
+                                        }
+                                        }
+                                        style={styles.textInput}
+                                        items={listecommune}
+                                    />
+                                </Text>
+
+                            </View>
+                        </View>
+                        : null
+
+                    }
+
+
+
+                    <Text style={styles.text_footer, {
+                        marginTop: 35, color: '#05375a',
+                        fontSize: 18
+                    }}>Adresse</Text>
                     <View style={styles.action}>
                         <FontAwesome
                             name="map"
@@ -266,7 +459,9 @@ const SignUpScreen3 = ({ navigation }) => {
                             placeholder="Ton adresse"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => textInputChange(val)}
+                            onChangeText={(val) => setData({
+                                ...data, adresse:val
+                            })}
                         />
                         {data.check_textInputChange ?
                             <Animatable.View
@@ -281,6 +476,35 @@ const SignUpScreen3 = ({ navigation }) => {
                             : null}
                     </View>
 
+                    <Text style={styles.text_footer, {
+                        marginTop: 35, color: '#05375a',
+                        fontSize: 18
+                    }}>Email</Text>
+                    <View style={styles.action}>
+                        <FontAwesome
+                            name="map"
+                            color="#05375a"
+                            size={20}
+                        />
+                        <TextInput
+                            placeholder="Ton ecole ou ton université"
+                            style={styles.textInput}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            onChangeText={(val) => setData({ ...data, email: val })}
+                        />
+                        {data.check_textInputChange ?
+                            <Animatable.View
+                                animation="bounceIn"
+                            >
+                                <Feather
+                                    name="check-circle"
+                                    color="green"
+                                    size={20}
+                                />
+                            </Animatable.View>
+                            : null}
+                    </View>
 
                     <View style={styles.button}>
                         <TouchableOpacity
@@ -298,12 +522,12 @@ const SignUpScreen3 = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+                </KeyboardAwareScrollView>
+               
             </Animatable.View>
         </View>
     );
 };
-
-export default SignUpScreen3;
 
 const styles = StyleSheet.create({
     container: {
@@ -374,4 +598,4 @@ const styles = StyleSheet.create({
         width: 200,
         marginTop: 20,
     },
-});
+})

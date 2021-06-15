@@ -8,8 +8,7 @@ import DatePicker from 'react-native-datepicker';
 import Axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
-import * as firebase from "firebase";
-import "@firebase/auth";
+import * as firebase from 'firebase';
 
 import SignUpScreen2 from './step2';
 import Home from '../home';
@@ -19,26 +18,14 @@ import { color } from 'react-native-reanimated';
 
 export default function SignUpScreen1({ navigation }) {
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDn9LSJFJJI8hBM32O5MavfRwYGacRyH1c",
-        authDomain: "projetbourse.firebaseapp.com",
-        projectId: "projetbourse",
-        storageBucket: "projetbourse.appspot.com",
-        messagingSenderId: "331170571375",
-        appId: "1:331170571375:web:175226c8e3bbfb5dc2d99a"
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const [step, setStep] = useState(1);
-    const [loading, setLoading] = React.useState(false);
     const recaptchaVerifier = React.useRef(null);
     const [verificationId, setVerificationId] = React.useState();
-    const [verificationCode, setVerificationCode] = React.useState();
-    // const firebaseConfig = firebase.apps.length ? firebase.app().options : undefined;
-    const [message, showMessage] = React.useState();
-    const attemptInvisibleVerification = false;
+  const [verificationCode, setVerificationCode] = React.useState();
+  const firebaseConfig = firebase.apps.length ? firebase.app().options : undefined;
+  const [message, showMessage] = React.useState();
+  const attemptInvisibleVerification = false;
     const [listesexe, setListsexe] = useState([]);
     const [data, setData] = React.useState({
         nom: '',
@@ -115,89 +102,76 @@ export default function SignUpScreen1({ navigation }) {
         });
     }
 
-    const enregistrer = () => {
+    const enregistrer =  () => {
         // The FirebaseRecaptchaVerifierModal ref implements the
         // FirebaseAuthApplicationVerifier interface and can be
         // passed directly to `verifyPhoneNumber`.
-
-        const player = {
-            nom: data.nom,
-            postnom: data.postnom,
-            prenom: data.prenom,
-            telephone: "+243" + data.telephone,
-            password: data.pwd,
-            sexe_id: data.sex,
-        }
-
-        console.log(player);
-
-        // Axios.post(instance.baseURL + requests.fetchJoueur, player)
-        // .then(res => {
-        //     console.log("Joueur Enregistré");
-        //     navigation.navigate('Home')
-
-        // })
-        // .catch(err => {
-        //     console.log("Echec de l'enregistrement");
-
-        // })
-    }
-
-
-
-    const nextstep = async () => {
-
-        // console.log("clivk okkkkkkk");
-
-        // const numeroTelephone = "+243" + data.telephone;
-
         // try {
 
-        //     const phoneProvider = new firebase.auth.PhoneAuthProvider();
-        //     const verificationId = await phoneProvider.verifyPhoneNumber(
-        //         numeroTelephone,
-        //         recaptchaVerifier.current
-        //       );
-        //       console.log('verificationId='+verificationId);
-        //       setVerificationId(verificationId);
-        //       showMessage({
-        //         text: 'Un code de vérification vous a été envoyé.',
-        //       });
-        //     } catch (err) {
-        //       showMessage({ text: `Error: ${err.message}`, color: 'red' });
-        //       console.log(err);
-        //     }
+            const player = {
+                nom: data.nom,
+                postnom: data.postnom,
+                prenom: data.prenom,
+                telephone: "+243" + data.telephone,
+                password: data.pwd,
+                sexe_id: data.sex,
+            }
+            console.log(player);
+
+            // const phoneProvider = new firebase.auth.PhoneAuthProvider();
+            // const verificationId = await phoneProvider.verifyPhoneNumber(
+            //     player.telephone,
+            //     recaptchaVerifier.current
+            //   );
+            //   setVerificationId(verificationId);
+            //   showMessage({
+            //     text: 'Un code de vérification vous a été envoyé.',
+            //   });
+            // } catch (err) {
+            //   showMessage({ text: `Error: ${err.message}`, color: 'red' });
+            // }
+          }
+
+            Axios.post(instance.baseURL + requests.fetchJoueur, player)
+                .then(res => {
+                    console.log("Joueur Enregistré");
+                    navigation.navigate('Home')
+    
+                })
+                .catch(err => {
+                    console.log("Echec de l'enregistrement");
+    
+                })
+
+    const nextstep = () => {
+        console.log("click");
+        console.log(erreur);
+        if (data.nom.length < 3) {
+            setErreur({ ...erreur, Erreurnom: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
 
 
-        // console.log("click");
-        // console.log(erreur);
-        // console.log(data);
-        // if (data.nom.length < 3) {
-        //     setErreur({ ...erreur, Erreurnom: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
 
+        }
+        else if (data.postnom.length < 3) {
+            setErreur({ ...erreur, Erreurpostnom: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
+        }
 
+        else if (data.prenom.length < 3) {
+            setErreur({ ...erreur, Erreurprenom: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
+        }
 
-        // }
-        // else if (data.postnom.length < 3) {
-        //     setErreur({ ...erreur, Erreurpostnom: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
-        // }
+        else if (data.telephone.length < 3) {
+            setErreur({ ...erreur, Erreurtelephone: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
+        }
 
-        // else if (data.prenom.length < 3) {
-        //     setErreur({ ...erreur, Erreurprenom: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
-        // }
+        else if (data.pwd != data.confirm_pwd) {
+            setErreur({ ...erreur, Erreurconfirm_pwd: "Les mots de passe ne correpondent pas", ErreurStep: "Veuillez remplir correctement vos champs" })
+        }
 
-        // else if (data.telephone.length < 3) {
-        //     setErreur({ ...erreur, Erreurtelephone: "Ce format n'est pas valide", ErreurStep: "Veuillez remplir correctement vos champs" })
-        // }
+        else {
 
-        // else if (data.pwd != data.confirm_pwd) {
-        //     setErreur({ ...erreur, Erreurconfirm_pwd: "Les mots de passe ne correpondent pas", ErreurStep: "Veuillez remplir correctement vos champs" })
-        // }
-
-        // else {
-
-        //     setStep(step + 1);
-        // }
+            setStep(step + 1);
+        }
     }
 
     const goBack = () => {
@@ -208,24 +182,6 @@ export default function SignUpScreen1({ navigation }) {
     const changeMoney = (mymoney) => {
         setData({ ...data, money: mymoney });
     }
-
-
-
-    sendCode = () => { 
-        if(data.telephone.length ==9){
-            setLoading(true);
-            const phoneProvider = new firebase.auth.PhoneAuthProvider();
-            phoneProvider
-            .verifyPhoneNumber(data.telephone,recaptchaVerifier.current)
-            .then(()=>{
-                setLoading(false);
-                setStep(step + 1);
-            })
-            .catch((e)=>console.log(e));
-        } else{
-            alert("Numéro de téléphone invalide")
-        }
-    };
 
 
     switch (step) {
@@ -259,7 +215,6 @@ export default function SignUpScreen1({ navigation }) {
                                     autoCapitalize="none"
                                     onChangeText={(val) => {
                                         setData({ ...data, nom: val })
-                                        console.log(val);
                                         setErreur({
                                             ...erreur, Erreurnom: '', ErreurStep: '',
                                         })
@@ -383,6 +338,12 @@ export default function SignUpScreen1({ navigation }) {
                                     </View>
 
                                 </TouchableOpacity>
+
+                                <FirebaseRecaptchaVerifierModal
+        ref={recaptchaVerifier}
+        firebaseConfig={firebaseConfig}
+        attemptInvisibleVerification={attemptInvisibleVerification}
+      />
 
                                 <TextInput
                                     placeholder="893338262"
@@ -530,33 +491,24 @@ export default function SignUpScreen1({ navigation }) {
                             <Text style={{ color: "red" }}>{erreur.Erreurconfirm_pwd}</Text>
                             <View style={styles.button}>
                                 <TouchableOpacity
-                                    onPress={sendCode}
-                                    // nextstep()
+                                    onPress={() => nextstep()
+
+                                    }
                                     style={[styles.signIn, {
                                         borderColor: '#1D2E3F',
                                         borderWidth: 1,
                                     }]}
                                 >
-
-                                    {loading ? (
-                                        <ActivityIndicator color="#87c965" />
-                                    ) : (
-                                        <Text style={[styles.textSign, {
-                                            color: '#1D2E3F'
-                                        }]}>Suivant{"    "}
-                                            <FontAwesome
-                                                name="arrow-right"
-                                                color="#05375a"
-                                                size={20}
-                                            /></Text>
-                                    )}
+                                    <Text style={[styles.textSign, {
+                                        color: '#1D2E3F'
+                                    }]}>Suivant{"    "}
+                                        <FontAwesome
+                                            name="arrow-right"
+                                            color="#05375a"
+                                            size={20}
+                                        /></Text>
 
                                 </TouchableOpacity>
-                                <FirebaseRecaptchaVerifierModal
-                                    ref={recaptchaVerifier}
-                                    firebaseConfig={firebaseConfig}
-                                    // attemptInvisibleVerification={attemptInvisibleVerification}
-                                />
                             </View>
 
                             <View style={styles.textPrivate}

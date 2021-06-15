@@ -16,7 +16,7 @@ const landingpage = ({ navigation }) => {
         <Animatable.Image
         animation="slideInDown"
         iterationCount={2}
-        source={require('../../assets/zandomobile.png')}
+        source={require('../../assets/wenzeplus.jpg')}
           style={style.logo}
           resizeMode="stretch"
         />
@@ -51,7 +51,7 @@ const landingpage = ({ navigation }) => {
           </View>
           </TouchableOpacity>
           <TouchableOpacity
-                   onPress={() => navigation.navigate('Inscription3')}
+                   onPress={() => navigation.navigate('Inscription1')}
                     style={{
                         // borderColor: '#1D2E3F',
                         // borderWidth: 1,

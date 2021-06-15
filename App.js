@@ -9,6 +9,7 @@ import SignUpScreen1 from './src/screens/signup/step1';
 import SignUpScreen2 from './src/screens/signup/step2';
 import SignUpScreen3 from './src/screens/signup/step3';
 import Home from './src/screens/home';
+import Homepost from './src/screens/homepost';
 
 
 const Stack = createStackNavigator();
@@ -41,6 +42,10 @@ function App() {
            <Stack.Screen 
           name="Home" 
           component={Home}
+          options={{headerShown:false}} />
+          <Stack.Screen 
+          name="Homepost" 
+          component={Homepost}
           options={{headerShown:false}} />
         </Stack.Navigator>
       </NavigationContainer>

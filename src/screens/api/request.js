@@ -1,11 +1,12 @@
 const requests = {
     fetchJoueur: `/joueur`,
-    fetchProvince: `/commune/province/:id`,
+    fetchCommuneByProvince: `/commune/province/`,
     fetchCategorie: `/categorie`,
-    fetchNiveauByCategorie: `/niveau/categorie/:id`,
+    fetchProvince: `/province`,
+    fetchNiveauByCategorie: `/niveau/categorie/`,
     fetchNiveau: `/niveau`,
     fetchSexe: `/sexe`,
-    fetchOption: `/option/categorie/:id`,
+    fetchOptionByCategory: `/option/categorie/`,
 }
 
 export default requests;
